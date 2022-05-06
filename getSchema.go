@@ -42,7 +42,7 @@ func exists(username string) int {
 		return userid
 	}
 	defer db.Close()
-	query := fmt.Sprintf(`SELECT "id" FROM "users" WHERE username=%s`, username)
+	query := fmt.Sprintf(`SELECT "id" FROM "users" WHERE username='%s'`, username)
 	rows, err := db.Query(query)
 	for rows.Next() {
 		var id int
@@ -130,7 +130,7 @@ func ListUsers() ([]UserData, error) {
 	defer db.Close()
 	query := `SELECT "id","username","name","surname","description" 
 			FROM "users","userdata"
-			WHERE users.id=userdata.id`
+			WHERE users.id=userdata.userid`
 	rows, err := db.Query(query)
 	if err != nil {
 		return Data, err
