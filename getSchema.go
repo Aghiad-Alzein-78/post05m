@@ -37,6 +37,7 @@ func exists(username string) int {
 	username = strings.ToLower(username)
 	userid := -1
 	db, err := openConnection()
+
 	if err != nil {
 		print(err)
 		return userid
@@ -44,6 +45,10 @@ func exists(username string) int {
 	defer db.Close()
 	query := fmt.Sprintf(`SELECT "id" FROM "users" WHERE username='%s'`, username)
 	rows, err := db.Query(query)
+	if err != nil {
+		print(err)
+		return -1
+	}
 	for rows.Next() {
 		var id int
 		err = rows.Scan(&id)
@@ -69,6 +74,7 @@ func AddUser(d UserData) int {
 		print("User already existed...")
 		return -1
 	}
+	print("---------------------------------------------")
 	insertStatement := `INSERT INTO "users" ("username") VALUES ($1)`
 	_, err = db.Exec(insertStatement, d.Username)
 	if err != nil {
@@ -76,11 +82,12 @@ func AddUser(d UserData) int {
 		return -1
 	}
 	userid = exists(d.Username)
+	print("the userid inside users table", userid)
 	if userid == -1 {
 		return -1
 	}
 	insertStatement = `INSERT INTO "userdata" ("userid","name","surname","description") VALUES ($1,$2,$3,$4)`
-	_, err = db.Exec(insertStatement, userid, d.Username, d.Surname, d.Description)
+	_, err = db.Exec(insertStatement, userid, d.Name, d.Surname, d.Description)
 	if err != nil {
 		print("inserting into userdata table", err)
 		return -1
@@ -172,5 +179,3 @@ func UpdateUser(d UserData) error {
 }
 
 var print = fmt.Println
-
-//finished
